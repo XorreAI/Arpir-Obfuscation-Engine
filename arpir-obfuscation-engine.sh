@@ -107,7 +107,14 @@ create_vault() {
         if [[ $response -eq 0 ]]; then
             vault_name="$user_input"  # Update vault_name to user's input
             echo "User accepted/entered vault name: $vault_name"
-            break  # Exit loop if user accepts a name
+
+            # Check if the directory with the vault name already exists
+            if [ -d "/home/user/_Vault/$vault_name" ]; then
+                zenity --error --text="A vault with the name '$vault_name' already exists. Please choose a different name." --width=300 --height=100
+                continue  # Re-prompt for vault name if it already exists
+            else
+                break  # Exit loop if user accepts a name and it does not exist
+            fi
         elif [[ $response -eq 1 ]]; then
             echo "User requested a new name suggestion."
             continue  # Continue looping to suggest a new name
@@ -118,7 +125,14 @@ create_vault() {
         fi
     done
 
-
+    # Check if there is at least 4GB of free space available
+    local available_space=$(df --output=avail /home | tail -1)
+    available_space=$((available_space / 1024))  # Convert to MB
+    if [[ $available_space -lt 4096 ]]; then
+        zenity --error --text="Not enough free space to create a new vault. Please ensure at least 4GB of free space is available." --width=300 --height=100
+        echo "Not enough free space. Operation cancelled."
+        return 1
+    fi
 
     # Password input stage with retry on mismatch
     while true; do
@@ -150,7 +164,6 @@ create_vault() {
         fi
     done
 
-
     local encrypted_dir="${HOME}/_Vault/$vault_name/"
     local decrypted_dir="${HOME}/_Decrypted/"
     mkdir -p "$encrypted_dir" "$decrypted_dir"
@@ -167,12 +180,6 @@ expect "Verify Encfs Password:"
 send "$password\r"
 expect eof
 EOF
-
-    # if [[ $? -eq 0 ]]; then
-    #     zenity --info --text="Vault '$vault_name' created and now generating random files..." --width=300 --height=100
-    #     # Generate random files
-    #     # generate_random_files 2100000 30  # Call the function to generate random files
-    #     generate_obfuscation
 
     if [[ $? -eq 0 ]]; then
         zenity --info --text="Vault '$vault_name' created and now generating random files..." --width=300 --height=100
@@ -195,7 +202,6 @@ EOF
             echo "Current directory size: ${current_size}M / Target size: ${target_size}"
         done
 
-
         # Create directory _Files in decrypted directory
         mkdir -p "${decrypted_dir}_Files"
 
@@ -205,6 +211,9 @@ EOF
         zenity --error --title="Vault Creation Failed" --text="Failed to create the vault. Please check the inputs and try again." --width=300 --height=200
     fi
 }
+
+
+
 
 
 
@@ -714,6 +723,15 @@ dismount_vault() {
 
 
 generate_decoy_vault() {
+    # Check if there is at least 4GB of free space available
+    local available_space=$(df --output=avail /home | tail -1)
+    available_space=$((available_space / 1024))  # Convert to MB
+    if [[ $available_space -lt 4096 ]]; then
+        zenity --error --text="Not enough free space to generate a new decoy vault. Please ensure at least 4GB of free space is available." --width=300 --height=100
+        echo "Not enough free space. Operation cancelled."
+        return 1
+    fi
+
     # Generate a random variable from the specified file
     local random_variable=$(generate_random_name_from_file)
 
@@ -750,6 +768,7 @@ generate_decoy_vault() {
 
     echo "Operations completed with random variable $random_variable"
 }
+
 
 
 
@@ -846,10 +865,18 @@ generate_mass_decoy_vaults() {
 
 
 new_container_setup() {
+    # Check if there is at least 30GB of free space available
+    local available_space=$(df --output=avail /home | tail -1)
+    available_space=$((available_space / 1024 / 1024))  # Convert to GB
+    if [[ $available_space -lt 30 ]]; then
+        zenity --error --text="Not enough free space to set up a new container. Please ensure at least 30GB of free space is available." --width=300 --height=100
+        echo "Not enough free space. Operation cancelled."
+        return 1
+    fi
+
     # Run create_vault function
-    create_vault
-    dismount_vault
-    # fusermount -u ~/_Decrypted
+    # create_vault
+    # dismount_vault
 
     # Run generate_mass_decoy_vaults function
     generate_mass_decoy_vaults
@@ -858,6 +885,13 @@ new_container_setup() {
     local min_size=20  # 20 GB
     local max_size=40  # 40 GB
     local target_size_gb=$((RANDOM % (max_size - min_size + 1) + min_size))
+
+    # Check if the target size is more than 60% of the available space
+    local sixty_percent_of_available_space=$((available_space * 60 / 100))
+    if [[ $target_size_gb -gt $sixty_percent_of_available_space ]]; then
+        target_size_gb=20  # Use 20GB as the target size if the random size is too large
+    fi
+
     local target_size=$((target_size_gb * 1024 * 1024 * 1024))  # Convert GB to bytes for comparison
 
     echo "Target size for /home/user/_Vault is $target_size_gb GB"
@@ -873,6 +907,7 @@ new_container_setup() {
 
     echo "The size of /home/user/_Vault now exceeds $target_size_gb GB."
 }
+
 
 
 
