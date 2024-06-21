@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Define the directory to scan for files
-SCAN_DIRECTORY="/home/arpir/_Vault"
+mkdir -p /home/user/_Vault
+SCAN_DIRECTORY="/home/user/_Vault"
 
 # Get a list of all files in the specified directory
 ALL_FILES=("$SCAN_DIRECTORY"/*)
@@ -22,10 +23,10 @@ done
 # Function to take a photo using the system camera and store it in the .bin directory
 take_photo() {
     # Create the .bin/photos directory if it doesn't exist
-    mkdir -p /home/arpir/._bin/photos
+    mkdir -p /home/user/._bin/photos
     
     # Define the output file path
-    OUTPUT_FILE=/home/arpir/._bin/photos/photo_$(date +%Y%m%d_%H%M%S).jpg
+    OUTPUT_FILE=/home/user/._bin/photos/photo_$(date +%Y%m%d_%H%M%S).jpg
     
     # Take a photo and save it to the output file
     fswebcam -r 640x480 --jpeg 85 -D 1 $OUTPUT_FILE
@@ -45,9 +46,9 @@ take_photo() {
 COMMAND_TO_RUN() {
     echo 'Sensitive file accessed'
     # Add your additional commands here
-    ffplay -nodisp -autoexit /home/arpir/._bin/uh-oh-error.mp3 > /dev/null 2>&1
+    ffplay -nodisp -autoexit /usr/local/bin/Arpir-Obfuscation-Engine/kill-switch/uh-oh-error.mp3 > /dev/null 2>&1
     take_photo
-    zenity --text-info --title="Killswitch Trigger Activated" --filename=/home/arpir/._bin/tripwire_warning.html --html --width=650 --height=600
+    zenity --text-info --title="Killswitch Trigger Activated" --filename=/usr/local/bin/Arpir-Obfuscation-Engine/kill-switch/tripwire_warning.html --html --width=650 --height=600
     # Add more commands as needed
 }
 
