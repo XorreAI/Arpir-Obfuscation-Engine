@@ -79,6 +79,44 @@ warn_mode() {
     done
 }
 
+# Function to execute in watch mode
+watch_mode() {
+    COMMAND_TO_RUN() {
+        local accessed_file=$1
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Sensitive file accessed: $accessed_file" >> /var/log/arpir/access.log
+        # Only take a photo and log the access attempt
+        take_photo
+    }
+
+    # Function to monitor files for access
+    monitor_access() {
+        # Monitor files for access events
+        while true; do
+            local file
+            file=$(inotifywait -q -e access --format '%w%f' "${FILES[@]}")
+            COMMAND_TO_RUN "$file"
+        done
+    }
+
+    # Function to set a harmless process name
+    set_process_name() {
+        # Set process name to something innocuous
+        echo $$ > /proc/$$/comm
+    }
+
+    # Trap exit to reset process name when the script exits
+    trap 'echo bash > /proc/$$/comm' EXIT
+
+    # Set the process name
+    set_process_name
+
+    # Main loop to ensure the script runs continuously
+    while true; do
+        # Monitor files for access
+        monitor_access
+    done
+}
+
 # Main script logic to handle command line options
 case "$1" in
     --warn-mode)
