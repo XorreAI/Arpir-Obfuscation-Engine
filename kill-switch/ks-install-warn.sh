@@ -34,7 +34,7 @@ Description=Aprir Killswitch Service
 After=network.target
 
 [Service]
-ExecStart=$SCRIPT_LOCATION --watch-mode
+ExecStart=$SCRIPT_LOCATION --warn-mode
 Restart=on-failure
 User=root
 
