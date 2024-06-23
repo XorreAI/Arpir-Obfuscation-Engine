@@ -1,6 +1,3 @@
-
-
-
 #!/bin/bash
 
 # Define the directory to scan for files
@@ -22,29 +19,29 @@ for file in "${ALL_FILES[@]}"; do
     fi
 done
 
-# Function to take a photo using the system camera and store it in the .bin directory
+# Function to take a photo using the system camera and store it in the /var/log/arpir/photos directory
 take_photo() {
-    # Create the .bin/photos directory if it doesn't exist
-    mkdir -p /home/user/._bin/photos
+    # Create the /var/log/arpir/photos directory if it doesn't exist
+    mkdir -p /var/log/arpir/photos
     
     # Define the output file path
-    OUTPUT_FILE=/home/user/._bin/photos/photo_$(date +%Y%m%d_%H%M%S).jpg
+    OUTPUT_FILE=/var/log/arpir/photos/photo_$(date +%Y%m%d_%H%M%S).jpg
     
     # Take a photo and save it to the output file
     fswebcam -r 640x480 --jpeg 85 -D 1 $OUTPUT_FILE
     
     # Check if the photo was taken successfully
     if [ -f $OUTPUT_FILE ]; then
-        echo "Photo saved to $OUTPUT_FILE"
+        echo "Photo saved to $OUTPUT_FILE" >> /var/log/arpir/access.log
     else
-        echo "Failed to take photo"
+        echo "Failed to take photo" >> /var/log/arpir/access.log
     fi
 }
 
 # Function to execute in warn mode
 warn_mode() {
     COMMAND_TO_RUN() {
-        echo 'Sensitive file accessed'
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Sensitive file accessed" >> /var/log/arpir/access.log
         # Add your additional commands here
         ffplay -nodisp -autoexit /usr/local/bin/Arpir-Obfuscation-Engine/kill-switch/uh-oh-error.mp3 > /dev/null 2>&1
         take_photo
@@ -75,18 +72,6 @@ warn_mode() {
         # Monitor files for access
         monitor_access
     done
-}
-
-# Function to execute in watch mode (placeholder)
-watch_mode() {
-    echo "Watch mode activated"
-    # Add functionality for watch mode
-}
-
-# Function to execute in destructive mode (placeholder)
-destructive_mode() {
-    echo "Destructive mode activated"
-    # Add functionality for destructive mode
 }
 
 # Main script logic to handle command line options
