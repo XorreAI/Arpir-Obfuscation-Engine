@@ -41,7 +41,8 @@ take_photo() {
 # Function to execute in warn mode
 warn_mode() {
     COMMAND_TO_RUN() {
-        echo "$(date '+%Y-%m-%d %H:%M:%S') - Sensitive file accessed" >> /var/log/arpir/access.log
+        local accessed_file=$1
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Sensitive file accessed: $accessed_file" >> /var/log/arpir/access.log
         # Add your additional commands here
         ffplay -nodisp -autoexit /usr/local/bin/Arpir-Obfuscation-Engine/kill-switch/uh-oh-error.mp3 > /dev/null 2>&1
         take_photo
@@ -52,7 +53,11 @@ warn_mode() {
     # Function to monitor files for access
     monitor_access() {
         # Monitor files for access events
-        inotifywait -q -e access "${FILES[@]}" && COMMAND_TO_RUN
+        while true; do
+            local file
+            file=$(inotifywait -q -e access --format '%w%f' "${FILES[@]}")
+            COMMAND_TO_RUN "$file"
+        done
     }
 
     # Function to set a harmless process name
