@@ -38,7 +38,13 @@ sudo dnf install -y encfs
 sudo dnf install -y wget
 sudo dnf install -y expect
 
-sudo dnf install gcc glibc-devel libsodium-devel make autoconf
+sudo dnf install -y gcc
+sudo dnf install -y glibc-devel
+sudo dnf install -y libsodium-devel
+sudo dnf install -y make
+sudo dnf install -y autoconf
+sudo dnf install -y unrar
+
 
 sudo dnf install -y plasma-discover
 sudo dnf install -y snapd
