@@ -47,11 +47,11 @@ sudo cp -r $TMP_DIR $DESTINATION
 
 # Make the script executable
 echo "Making the script executable"
-sudo chmod +x /usr/local/bin/Arpir-Obfuscation-Engine/*.sh
-sudo chmod +x /usr/local/bin/Arpir-Obfuscation-Engine/*/*.sh
+sudo chmod +x $DESTINATION/*.sh
+sudo chmod +x $DESTINATION/*/*.sh
 
 
-sudo bash prereq-install.sh
+sudo bash $DESTINATION/_bin/prereq-install.sh
 # sudo cp -r /tmp/Arpir-Obfuscation-Engine/ /usr/local/bin/
 # sudo chmod +x /usr/local/bin/Arpir-Obfuscation-Engine/*.sh
 

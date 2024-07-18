@@ -34,6 +34,7 @@
 start_time=$(date +%s)  # Start timing
 export LIBGL_ALWAYS_SOFTWARE=1
 mkdir -p "/home/user/_Decrypted"
+DESTINATION="/home/user/.arpir-bin"
 
 setup_encfs() {
     check_decrypted_files
@@ -68,7 +69,7 @@ create_vault() {
 
     # Function to suggest a vault name
     suggest_vault_name() {
-        local names_file="/usr/local/bin/Arpir-Obfuscation-Engine/_bin/random.txt"
+        local names_file="$DESTINATION/_bin/random.txt"
         if [ ! -f "$names_file" ]; then
             zenity --error --text="The file $names_file does not exist." --width=300 --height=100
             return 1
@@ -220,7 +221,7 @@ EOF
 
 
 generate_random_name_from_file() {
-    local names_file="/usr/local/bin/Arpir-Obfuscation-Engine/_bin/random.txt"
+    local names_file="$DESTINATION/_bin/random.txt"
 
     # Check if the file exists
     if [ ! -f "$names_file" ]; then
