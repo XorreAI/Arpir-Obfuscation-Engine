@@ -34,8 +34,8 @@ ARPIR_REPO_URL="https://github.com/XorreAI/Arpir-Obfuscation-Engine"
 TMP_DIR="/tmp/Arpir-Obfuscation-Engine"
 
 # Define the destination location for the script
-DESTINATION="/usr/local/bin/Arpir-Obfuscation-Engine"
-SCRIPT_LOCATION="$DESTINATION/kill-switch/aprir-killswitch.sh"
+DESTINATION="/home/user/.arpir-bin"
+# SCRIPT_LOCATION="$DESTINATION/kill-switch/aprir-killswitch.sh"
 
 # Clone the repository into the temporary directory
 echo "Cloning the repository into $TMP_DIR"

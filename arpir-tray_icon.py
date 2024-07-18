@@ -7,7 +7,7 @@ gi.require_version('AppIndicator3', '0.1')
 from gi.repository import Gtk, AppIndicator3, Pango
 
 def execute_script(command):
-    subprocess.Popen(['bash', '/usr/local/bin/Arpir-Obfuscation-Engine/arpir-obfuscation-engine.sh'] + command.split())
+    subprocess.Popen(['bash', '/home/user/.arpir-bin/arpir-obfuscation-engine.sh'] + command.split())
     print(f"Script executed with command: {command}")
 
 class TrayIconApp:
