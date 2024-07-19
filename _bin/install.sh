@@ -45,7 +45,7 @@ echo "Copying the Arpir-Obfuscation-Engine folder to $DESTINATION"
 sudo cp -r $TMP_DIR $DESTINATION
 
 # Make the script executable
-echo "Making the script executable
+echo "Making the script executable"
 
 
 sudo chmod +x $DESTINATION/*.sh
