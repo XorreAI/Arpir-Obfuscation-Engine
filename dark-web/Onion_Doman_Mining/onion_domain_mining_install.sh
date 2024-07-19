@@ -48,8 +48,8 @@ if [ ! -f "/home/user/.arpir-bin/dark-web/Onion_Doman_Mining/mining_gui.sh" ]; t
     exit 1
 fi
 
-# Copy the mining_gui.sh script to the destination
-sudo cp "/home/user/.arpir-bin/dark-web/Onion_Doman_Mining/mining_gui.sh" "$MINING_GUI_SCRIPT"
+# Copy the mining_gui.sh script to the user scripts directory
+sudo cp "/home/user/.arpir-bin/dark-web/Onion_Doman_Mining/mining_gui.sh" "$MINING_SCRIPTS_DIR/mining_gui.sh"
 
 # Make the script executable
 echo "Making the script executable"

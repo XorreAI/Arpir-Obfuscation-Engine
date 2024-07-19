@@ -38,7 +38,7 @@ start_mining() {
 
     # Function to handle the cancel action
     cancel_script() {
-        pkill -f "/usr/local/bin/Onion-domain-mining/mkp224o"
+        pkill -f "mkp224o"
         zenity --info --text="Mining script cancelled." --width=300 --height=100
         rm "$output_file"
         exit 0
