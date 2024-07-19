@@ -23,6 +23,11 @@ MINING_SCRIPT=$(read_config "$CONFIG_FILE" "OnionMiningConfig" "MINING_SCRIPT")
 MINING_GUI_SCRIPT=$(read_config "$CONFIG_FILE" "OnionMiningConfig" "MINING_GUI_SCRIPT")
 USER_HOME=$(read_config "$CONFIG_FILE" "OnionMiningConfig" "USER_HOME")
 
+# Ensure the temporary directory is empty
+if [ -d "$ONION_TMP_DIR" ]; then
+    rm -rf "$ONION_TMP_DIR"
+fi
+
 # Clone the repository into the temporary directory
 echo "Cloning the repository into $ONION_TMP_DIR"
 git clone "$ONIONMINING_REPO_URL" "$ONION_TMP_DIR"
@@ -36,6 +41,15 @@ make
 # Copy the Onion-domain-mining folder to the destination
 echo "Copying the Onion-domain-mining folder to $ONION_DESTINATION"
 sudo cp -r "$ONION_TMP_DIR" "$ONION_DESTINATION"
+
+# Ensure the mining_gui.sh file exists in the ONION_TMP_DIR
+if [ ! -f "$ONION_TMP_DIR/mining_gui.sh" ]; then
+    echo "Error: mining_gui.sh not found in $ONION_TMP_DIR"
+    exit 1
+fi
+
+# Copy the mining_gui.sh script to the destination
+sudo cp "$ONION_TMP_DIR/mining_gui.sh" "$MINING_GUI_SCRIPT"
 
 # Make the script executable
 echo "Making the script executable"
@@ -55,13 +69,9 @@ chmod +w "$ONION_DOMAINS_FILE"
 echo "mkdir -p $MINING_SCRIPTS_DIR/domain_output" > "$MINING_SCRIPT"
 echo "$ONION_DESTINATION/mkp224o -f $ONION_DOMAINS_FILE -d $MINING_SCRIPTS_DIR/domain_output/" >> "$MINING_SCRIPT"
 
-# Copy the mining GUI script to the user scripts directory
-sudo cp "$ONION_DESTINATION/mining_gui.sh" "$MINING_GUI_SCRIPT"
-
 # Make the user scripts executable and change ownership
 sudo chmod +x "$MINING_SCRIPTS_DIR"/*.sh
 sudo chown $USER:$USER "$MINING_SCRIPTS_DIR"
 sudo chown $USER:$USER "$MINING_SCRIPTS_DIR"/*
 
 echo "Onion Mining Installation Complete. Ready to use."
-
