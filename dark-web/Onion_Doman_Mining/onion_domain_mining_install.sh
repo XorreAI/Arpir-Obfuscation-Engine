@@ -64,3 +64,4 @@ sudo chown $USER:$USER "$MINING_SCRIPTS_DIR"
 sudo chown $USER:$USER "$MINING_SCRIPTS_DIR"/*
 
 echo "Onion Mining Installation Complete. Ready to use."
+
