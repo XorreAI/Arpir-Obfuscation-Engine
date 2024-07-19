@@ -42,14 +42,14 @@ make
 echo "Copying the Onion-domain-mining folder to $ONION_DESTINATION"
 sudo cp -r "$ONION_TMP_DIR" "$ONION_DESTINATION"
 
-# Ensure the mining_gui.sh file exists in the ONION_TMP_DIR
-if [ ! -f "$ONION_TMP_DIR/mining_gui.sh" ]; then
-    echo "Error: mining_gui.sh not found in $ONION_TMP_DIR"
+# Ensure the mining_gui.sh file exists in the source directory
+if [ ! -f "/home/user/.arpir-bin/dark-web/Onion_Doman_Mining/mining_gui.sh" ]; then
+    echo "Error: mining_gui.sh not found in /home/user/.arpir-bin/dark-web/Onion_Doman_Mining"
     exit 1
 fi
 
 # Copy the mining_gui.sh script to the destination
-sudo cp "$ONION_TMP_DIR/mining_gui.sh" "$MINING_GUI_SCRIPT"
+sudo cp "/home/user/.arpir-bin/dark-web/Onion_Doman_Mining/mining_gui.sh" "$MINING_GUI_SCRIPT"
 
 # Make the script executable
 echo "Making the script executable"
