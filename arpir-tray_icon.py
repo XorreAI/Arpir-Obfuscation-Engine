@@ -1,18 +1,34 @@
-
 #!/usr/bin/env python3
 import gi
 import subprocess
+import configparser
+import os
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('AppIndicator3', '0.1')
 from gi.repository import Gtk, AppIndicator3, Pango
 
+# Function to read the configuration file
+def read_config(config_file, section, key):
+    config = configparser.ConfigParser()
+    config.read(config_file)
+    return config.get(section, key)
+
+# Define the configuration file path
+config_file = "/home/user/.arpir-bin/_bin/config.cfg"
+
+# Read values from the config file
+repo_url = read_config(config_file, 'ArpirConfig', 'ARPIR_REPO_URL')
+tmp_dir = read_config(config_file, 'ArpirConfig', 'TMP_DIR')
+destination = read_config(config_file, 'ArpirConfig', 'DESTINATION')
+
 def execute_script(command):
-    subprocess.Popen(['bash', '/home/user/.arpir-bin/arpir-obfuscation-engine.sh'] + command.split())
+    subprocess.Popen(['bash', os.path.join(destination, 'arpir-obfuscation-engine.sh')] + command.split())
     print(f"Script executed with command: {command}")
 
 class TrayIconApp:
     def __init__(self):
-        icon_path = "/usr/local/bin/Arpir-Obfuscation-Engine/_bin/Vault-Arpir.png"  # Path to the converted PNG icon
+        icon_path = os.path.join(destination, "_bin", "Vault-Arpir.png")  # Path to the converted PNG icon
 
         self.indicator = AppIndicator3.Indicator.new(
             "vault-manager",  # Unique ID for the app indicator
@@ -27,7 +43,7 @@ class TrayIconApp:
         # Define all the menu items with their corresponding bash arguments and descriptions
         menu_items = {
             'Mount Vault': ('--mount-vault', 'Select and mount your encrypted vault'),
-            'Exit Vault': ('--exit-vault', 'Safely exit and close your vault'),            
+            'Exit Vault': ('--exit-vault', 'Safely exit and close your vault'),
             'Create Vault': ('--create-vault', 'Create a new encrypted vault'),
             'New Container Setup': ('--new-container-setup', 'Guided setup for new containers including vault and decoy configuration.'),
             'Setup Decoy Container': ('--setup-decoy-container', 'Setup a decoy container for obfuscation'),

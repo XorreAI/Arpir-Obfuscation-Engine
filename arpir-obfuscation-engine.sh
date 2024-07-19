@@ -31,10 +31,12 @@
 
 #!/usr/bin/env bash
 
+# Load the configuration file
+source /home/user/.arpir-bin/_bin/config.cfg
+
 start_time=$(date +%s)  # Start timing
 export LIBGL_ALWAYS_SOFTWARE=1
-mkdir -p "/home/user/_Decrypted"
-DESTINATION="/home/user/.arpir-bin"
+mkdir -p "$DECRYPT_DEST"
 
 setup_encfs() {
     check_decrypted_files
@@ -44,8 +46,8 @@ setup_encfs() {
         return 1  # Use return to prevent terminal closure if sourced
     fi
 
-    local encrypted_dir="${HOME}/_Vault/${base_dir_name}/"
-    local decrypted_dir="${HOME}/_Decrypted/"
+    local encrypted_dir="${VAULT_DEST}/${base_dir_name}/"
+    local decrypted_dir="$DECRYPT_DEST"
     local password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 180)
     mkdir -p "$encrypted_dir" "$decrypted_dir"
     echo "Generated Password: $password"
@@ -62,7 +64,6 @@ expect eof
 EOF
     echo "EncFS volume mounted at $decrypted_dir"
 }
-
 
 create_vault() {
     check_decrypted_files
@@ -110,7 +111,7 @@ create_vault() {
             echo "User accepted/entered vault name: $vault_name"
 
             # Check if the directory with the vault name already exists
-            if [ -d "/home/user/_Vault/$vault_name" ]; then
+            if [ -d "$VAULT_DEST/$vault_name" ]; then
                 zenity --error --text="A vault with the name '$vault_name' already exists. Please choose a different name." --width=300 --height=100
                 continue  # Re-prompt for vault name if it already exists
             else
@@ -165,8 +166,8 @@ create_vault() {
         fi
     done
 
-    local encrypted_dir="${HOME}/_Vault/$vault_name/"
-    local decrypted_dir="${HOME}/_Decrypted/"
+    local encrypted_dir="${VAULT_DEST}/$vault_name/"
+    local decrypted_dir="$DECRYPT_DEST"
     mkdir -p "$encrypted_dir" "$decrypted_dir"
     echo $encrypted_dir > /tmp/active_vault.txt
 
@@ -213,13 +214,6 @@ EOF
     fi
 }
 
-
-
-
-
-
-
-
 generate_random_name_from_file() {
     local names_file="$DESTINATION/_bin/random.txt"
 
@@ -236,7 +230,7 @@ generate_random_name_from_file() {
     while true; do
         # Read a random line from the file
         random_name=$(shuf -n 1 "$names_file")
-        vault_dir="/home/user/_Vault/$random_name"
+        vault_dir="${VAULT_DEST}/$random_name"
 
         # Check if the directory already exists
         if [ ! -d "$vault_dir" ]; then
@@ -247,14 +241,10 @@ generate_random_name_from_file() {
     done
 }
 
-
-
-
-
 generate_random_files() {
     local base_num_chars="$1"
     local base_num_files="$2"
-    local root_dir="/home/user/_Decrypted/"
+    local root_dir="$DECRYPT_DEST"
 
     if [[ -z "$base_num_chars" || -z "$base_num_files" ]]; then
         echo "Usage: generate_random_files [number_of_characters] [base_number_of_files]"
@@ -317,11 +307,8 @@ distribute_files_among_directories() {
     echo "Files have been generated and distributed among directories, including nested subdirectories."
 }
 
-
-
-
 check_decrypted_files() {
-    local decrypted_dir="$HOME/_Decrypted"
+    local decrypted_dir="$DECRYPT_DEST"
 
     # Check if the directory exists and is not empty
     if [ -d "$decrypted_dir" ] && [ "$(ls -A "$decrypted_dir")" ]; then
@@ -337,7 +324,7 @@ check_decrypted_files() {
 }
 
 create_active_decoys() {
-    local target_dir="/home/user/_Decrypted/Decoy_Active"
+    local target_dir="$DECRYPT_DEST/Decoy_Active"
     mkdir -p "$target_dir"  # Ensure the directory exists
 
     # Generate between 1 and 4 files
@@ -358,11 +345,9 @@ create_active_decoys() {
     echo "Decoy files created and updated in $target_dir"
 }
 
-
-
 mount_vault() {
     check_decrypted_files
-    local VAULT_DIR="$HOME/_Vault"
+    local VAULT_DIR="$VAULT_DEST"
 
     # Get screen dimensions for Zenity
     local screen_dimensions=$(xrandr | grep -w connected | grep -oP '\d+x\d+\+\d+\+\d+' | head -1)
@@ -408,9 +393,9 @@ mount_vault() {
     (
     echo "10" # Start the progress
     echo "# Mounting $selected_dir..." 
-    mkdir -p "$HOME/_Decrypted/"
+    mkdir -p "$DECRYPT_DEST"
     local ENCFS6_CONFIG="$active_vault/.encfs6.xml"
-    if echo $password | encfs -v "$active_vault" "$HOME/_Decrypted/" --stdinpass; then
+    if echo $password | encfs -v "$active_vault" "$DECRYPT_DEST" --stdinpass; then
         echo "100" # Complete the progress bar
         zenity --info --title="Successfully Mounted files" --text="Hidden files mounted successfully in the folder _Decrypted." --width=$width --height=$height
     else
@@ -429,10 +414,8 @@ mount_vault() {
     return 0
 }
 
-
-
 change_password() {
-    local VAULT_DIR="$HOME/_Vault"
+    local VAULT_DIR="$VAULT_DEST"
 
     # Get screen dimensions for Zenity
     local screen_dimensions=$(xrandr | grep -w connected | grep -oP '\d+x\d+\+\d+\+\d+' | head -1)
@@ -523,11 +506,6 @@ EOF
     fi
 }
 
-
-
-
-
-
 randomize_timestamps() {
     echo "timestamp randomization begins"
     local directory="$1"
@@ -580,8 +558,6 @@ randomize_timestamps() {
 
     echo "timestamp finished"
 }
-
-
 
 execute_random_commands() {
     local commands=(
@@ -667,8 +643,6 @@ execute_random_commands() {
     echo "Running command: $command_to_run"
 }
 
-
-
 generate_obfuscation() {
     # Generate a random number between 2 and 21
     local num_commands=$(shuf -i 2-21 -n 1)
@@ -682,12 +656,8 @@ generate_obfuscation() {
     echo "File Generation Finished"
 }
 
-
-
-
-
 dismount_vault() {
-    local decrypted_dir="/home/user/_Decrypted"
+    local decrypted_dir="$DECRYPT_DEST"
 
     if mount | grep -q "$decrypted_dir"; then
         # Unmount the directory
@@ -720,8 +690,6 @@ dismount_vault() {
                --width=300 --height=200
     fi
 }
-
-
 
 generate_decoy_vault() {
     # Check if there is at least 4GB of free space available
@@ -769,11 +737,6 @@ generate_decoy_vault() {
 
     echo "Operations completed with random variable $random_variable"
 }
-
-
-
-
-
 
 generate_mass_decoy_vaults() {
     # Generate a random number between 1 and 10
@@ -862,9 +825,6 @@ generate_mass_decoy_vaults() {
     echo "Decoy vault generation completed."
 }
 
-
-
-
 new_container_setup() {
     # Check if there is at least 30GB of free space available
     local available_space=$(df --output=avail /home | tail -1)
@@ -876,8 +836,8 @@ new_container_setup() {
     fi
 
     # Run create_vault function
-    # create_vault
-    # dismount_vault
+    create_vault
+    dismount_vault
 
     # Run generate_mass_decoy_vaults function
     generate_mass_decoy_vaults
@@ -895,26 +855,20 @@ new_container_setup() {
 
     local target_size=$((target_size_gb * 1024 * 1024 * 1024))  # Convert GB to bytes for comparison
 
-    echo "Target size for /home/user/_Vault is $target_size_gb GB"
+    echo "Target size for $VAULT_DEST is $target_size_gb GB"
 
     # Check the actual size
-    local actual_size=$(du -sb /home/user/_Vault | cut -f1)
+    local actual_size=$(du -sb "$VAULT_DEST" | cut -f1)
 
     # Continue to add decoy vaults until the size requirement is met
     while [ "$actual_size" -lt "$target_size" ]; do
         generate_decoy_vault
-        actual_size=$(du -sb /home/user/_Vault | cut -f1)
+        actual_size=$(du -sb "$VAULT_DEST" | cut -f1)
     done
 
-    echo "The size of /home/user/_Vault now exceeds $target_size_gb GB."
+    echo "The size of $VAULT_DEST now exceeds $target_size_gb GB."
 }
 
-
-
-
-#!/bin/bash
-
-# Function to display help message
 show_help() {
     echo "Usage: $0 [option]"
     echo "Options:"
@@ -962,7 +916,7 @@ case "$1" in
         mount_vault
         ;;
     --randomize-access-data)
-        randomize_timestamps /home/user/_Vault
+        randomize_timestamps "$VAULT_DEST"
         ;;
     --help)
         show_help
@@ -974,10 +928,10 @@ case "$1" in
         ;;
 esac
 
-
 end_time=$(date +%s)
 elapsed_time=$((end_time - start_time))
 hours=$((elapsed_time / 3600))
 minutes=$(((elapsed_time % 3600) / 60))
 seconds=$((elapsed_time % 60))
 echo "Total execution time: $hours hours, $minutes minutes, $seconds seconds"
+

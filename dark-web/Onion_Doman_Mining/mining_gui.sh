@@ -1,8 +1,26 @@
 #!/bin/bash
 
+# Function to read configuration values
+read_config() {
+    local config_file=$1
+    local section=$2
+    local key=$3
+    awk -F= -v section="$section" -v key="$key" '
+    $0 ~ "\\[" section "\\]" { in_section=1 }
+    in_section && $1 == key { gsub(/^[ \t]+|[ \t]+$/, "", $2); print $2; exit }
+    ' "$config_file"
+}
+
+CONFIG_FILE="/home/user/.arpir-bin/_bin/config.cfg"
+
+# Read values from the configuration file
+MINING_SCRIPTS_DIR=$(read_config "$CONFIG_FILE" "ArpirConfig" "MINING_SCRIPTS_DIR")
+ONION_DOMAINS_FILE=$(read_config "$CONFIG_FILE" "ArpirConfig" "ONION_DOMAINS_FILE")
+MINING_SCRIPT=$(read_config "$CONFIG_FILE" "ArpirConfig" "MINING_SCRIPT")
+
 # Function to start mining and display output in a Zenity window
 start_mining() {
-    local script_path="./start_mining.sh"
+    local script_path="$MINING_SCRIPT"
 
     if [[ ! -x "$script_path" ]]; then
         zenity --error --text="The script $script_path is not executable or not found." --width=300 --height=100
