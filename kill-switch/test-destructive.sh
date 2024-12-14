@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define variables
-PARTITION="/dev/nvme0n1p1"
+PARTITION="/dev/nvme0n1p4"
 MOUNT_POINT="/mnt/backups"
 LABEL="backups"
-SOURCE_DIR="/home/user/pictures"
+SOURCE_DIR="/home/user/Pictures"
 
 # Unmount the partition if it's currently mounted
 if mount | grep "$PARTITION" > /dev/null; then
